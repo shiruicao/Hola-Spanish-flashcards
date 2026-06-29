@@ -1,4 +1,4 @@
-# ¡Hola!
+# ¡Hola!✨️
 # 每天 5 分钟，让西班牙语单词刻进DNA。
 
 --- 
@@ -35,6 +35,8 @@
 
  **唯一建议**：定期点右上角导出按钮。Markdown 或 CSV，一键下载。这就是你的永久数据资产。哪天浏览器挂了，导入回来就行。
 
+---
+
 ## 快速开始
  部署到 Vercel → 打开 → 开始录入。
 
@@ -49,10 +51,9 @@
 * 存储路径：Windows: %LocalAppData%\Google\Chrome\User Data\Default\Local Storage\leveldb；macOS: ~/Library/Application Support/Google/Chrome/Default/Local Storage/leveldb
 * CSV 编码：UTF-8 BOM，西班牙语重音字符（á é í ó ú ñ ¡ ¿）在 Excel 和 Numbers 中零乱码。
 
----
 
-## ⚠️警告：无痕模式和强力清理插件会清除 LocalStorage，请加白名单或定期导出！
+### ⚠️警告：无痕模式和强力清理插件会清除 LocalStorage，请加白名单或定期导出！
 
 ----
 
-# 🌟¡Que tengas un buen viaje de estudio! 🇪🇸
+## 🌟¡Que tengas un buen viaje de estudio! 🇪🇸
