@@ -1,43 +1,45 @@
-¡Hola!
-每天 5 分钟，让西班牙语单词刻进DNA。
+# ¡Hola!
+# 每天 5 分钟，让西班牙语单词刻进DNA。
 
 
-Why ¡Hola!
-学西班牙语的人不缺词书。Duolingo、Anki、Memrise —— 它们都在往你脑子里塞东西。
+## Why ¡Hola!  ？
 
-但你知道什么真正有效吗？你自己亲手录入的单词。
+### 学西班牙语的人不缺词书。Duolingo、Anki、Memrise —— 它们都在往你脑子里塞东西。
+
+### 但你知道什么真正有效吗？你自己亲手录入的单词。
 
 ¡Hola! 不是又一个"智能推荐词库"。它是一块空白的画布。你写什么，它就帮你记住什么。这是最原始、也是最有效的语言学习原理。
 
-三个核心体验
-🌿 看着舒服 — Sage/Sand 自然色调，没有刺眼的高饱和度。你会想一直打开它。
+## 三个核心体验
+* 🌿 看着舒服 — Sage/Sand 自然色调，没有刺眼的高饱和度。你会想一直打开它。
 
-🧠 不累脑子 — 每天只推送你需要复习的那几张卡片。不多不少。系统根据你的"认识/模糊"判断自动排程，从不过载。
+### 🧠 不累脑子 — 每天只推送你需要复习的那几张卡片。不多不少。系统根据你的"认识/模糊"判断自动排程，从不过载。
 
-📊 像 GitHub 热力图一样的打卡 — 看看你过去 30 天哪几天坚持了。连续打卡天数（Streak）会推着你继续。它比任何提醒都有效。
+### 📊 像 GitHub 热力图一样的打卡 — 看看你过去 30 天哪几天坚持了。连续打卡天数（Streak）会推着你继续。它比任何提醒都有效。
 
-怎么用
-✒️ 写：把你遇到的西班牙语单词录入进去，配上例句
-👆 点：卡片区每天推送今天该复习的。点击。会了→过，不会→再来
-👀 看：热力图上每天多一个绿格子。连续 7 天、30 天、100 天——你的语言肌肉在生长
-📢 发音？点一下就行。用的是你设备自带的离线语音引擎——比如 macOS 的 Jorge 和 Paulina 发音十分标准。断网也能用。
+## 怎么用
+### ✒️ 写：把你遇到的西班牙语单词录入进去，配上例句
+### 👆 点：卡片区每天推送今天该复习的。点击。会了→过，不会→再来
+### 👀 看：热力图上每天多一个绿格子。连续 7 天、30 天、100 天——你的语言肌肉在生长
+### 📢 发音？点一下就行。用的是你设备自带的离线语音引擎——比如 macOS 的 Jorge 和 Paulina 发音十分标准。断网也能用。
 
-你的数据是你的
-所有数据存你浏览器的 LocalStorage。没有任何服务器，没有任何 API 调用，没有任何第三方。你的词库永远不会离开你的设备。
+## 你的数据是你的
+### 所有数据存你浏览器的 LocalStorage。没有任何服务器，没有任何 API 调用，没有任何第三方。你的词库永远不会离开你的设备。
 
-唯一建议：定期点右上角导出按钮。Markdown 或 CSV，一键下载。这就是你的永久数据资产。哪天浏览器挂了，导入回来就行。
+## 唯一建议：定期点右上角导出按钮。Markdown 或 CSV，一键下载。这就是你的永久数据资产。哪天浏览器挂了，导入回来就行。
 
-快速开始
-部署到 Vercel → 打开 → 开始录入。
+## 快速开始
+### 部署到 Vercel → 打开 → 开始录入。
 
-✅就这么简单。
+## ✅就这么简单。
 
-技术细节（大部分用户不需要看）
-语音朗读（TTS）功能：使用的是浏览器原生搭载的 Web Speech API。现代操作系统（iOS、macOS、Android、Windows）均自带高品质的西班牙语本地离线发音引擎。因此，即使在断网状态下，只要设备系统支持，依然可以正常发音，且完全免费。
-时区修复：旧版用 UTC 判断日期，东八区深夜 24 点后打卡日历不刷新。已用 getTodayDateString() 替换，严格取设备本地时间，并每隔 10 秒后台轮询跨天。
-存储路径：Windows: %LocalAppData%\Google\Chrome\User Data\Default\Local Storage\leveldb；macOS: ~/Library/Application Support/Google/Chrome/Default/Local Storage/leveldb
-CSV 编码：UTF-8 BOM，西班牙语重音字符（á é í ó ú ñ ¡ ¿）在 Excel 和 Numbers 中零乱码。
+## 技术细节（大部分用户不需要看）
 
-⚠️警告：无痕模式和强力清理插件会清除 LocalStorage，请加白名单或定期导出！
+* 语音朗读（TTS）功能：使用的是浏览器原生搭载的 Web Speech API。现代操作系统（iOS、macOS、Android、Windows）均自带高品质的西班牙语本地离线发音引擎。因此，即使在断网状态下，只要设备系统支持，依然可以正常发音，且完全免费。
+* 时区修复：旧版用 UTC 判断日期，东八区深夜 24 点后打卡日历不刷新。已用 getTodayDateString() 替换，严格取设备本地时间，并每隔 10 秒后台轮询跨天。
+* 存储路径：Windows: %LocalAppData%\Google\Chrome\User Data\Default\Local Storage\leveldb；macOS: ~/Library/Application Support/Google/Chrome/Default/Local Storage/leveldb
+* CSV 编码：UTF-8 BOM，西班牙语重音字符（á é í ó ú ñ ¡ ¿）在 Excel 和 Numbers 中零乱码。
 
-🌟¡Que tengas un buen viaje de estudio! 🇪🇸
+## ⚠️警告：无痕模式和强力清理插件会清除 LocalStorage，请加白名单或定期导出！
+
+# 🌟¡Que tengas un buen viaje de estudio! 🇪🇸
