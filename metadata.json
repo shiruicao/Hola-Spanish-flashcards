@@ -1,0 +1,6 @@
+{
+  "name": "¡Hola! 西班牙语单词本",
+  "description": "一个精美、偏绿色调且易于使用的西班牙语单词学习与复习抽认卡系统。支持双语对照、智能记忆复习规则、高级词库管理与统计图表。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
