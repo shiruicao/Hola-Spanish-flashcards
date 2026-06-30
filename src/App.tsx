@@ -361,11 +361,6 @@ export default function App() {
   const [autoAdvanceTimerId, setAutoAdvanceTimerId] = useState<any>(null);
   const [pendingNextAction, setPendingNextAction] = useState<any>(null);
 
-  // --- IMPORT & AI TEXT RECOGNITION STATE ---
-  const [aiPasteText, setAiPasteText] = useState<string>("");
-  const [isAiParsing, setIsAiParsing] = useState<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   // --- MULTILINGUAL DICTIONARY KEYWORDS ---
   const t = {
     zh: {
@@ -402,12 +397,6 @@ export default function App() {
       englishLabel: "英文翻译",
       confirmSave: "确定保存",
       cancel: "取消",
-      aiSection: "Gemini AI 智能文本识别录入",
-      aiPlaceholder: "将您从PDF、网页或文章中复制的内容（包含西班牙语和翻译）直接粘贴在此处。Gemini AI 会自动为您分析并导入单词卡！",
-      aiParseBtn: "Gemini 智能识别并导入",
-      aiSuccess: "Gemini 成功提取并导入了 {count} 个单词卡！",
-      uploadFile: "或者，上传外部字典文件 ( 支持 CSV, JSON, TXT )",
-      dragTip: "点击上传或拖拽文件到此处",
       rulesTitle: "复习单词原则",
       rulesTime: "时间优先",
       rulesLevel: "熟悉度优先",
@@ -449,8 +438,8 @@ export default function App() {
       learnSuccess: "All words for today are learned! Great job! 🎉",
       learnAgain: "Review Another Set",
       resetQueue: "Regenerate Today's Queue",
-      notLearned: "Won't",
-      learned: "Will/Learned",
+      notLearned: "Unknown",
+      learned: "Known",
       notLearnedShortcut: "[←] Arrow",
       learnedShortcut: "[→] Arrow",
       progress: "Today's Progress",
@@ -464,12 +453,6 @@ export default function App() {
       englishLabel: "English Translation",
       confirmSave: "Save Word",
       cancel: "Cancel",
-      aiSection: "Gemini AI Text Recognition & Import",
-      aiPlaceholder: "Paste any raw text copied from PDFs, websites, or notes containing Spanish words and translations. Gemini AI will analyze and import them automatically!",
-      aiParseBtn: "Smart Parse & Import with Gemini",
-      aiSuccess: "Gemini successfully extracted and imported {count} cards!",
-      uploadFile: "Or, upload a dictionary file (CSV, JSON, TXT)",
-      dragTip: "Click or drag files here to upload",
       rulesTitle: "Word Priority Selection Rule",
       rulesTime: "Time Priority (Latest input first)",
       rulesLevel: "Familiarity Priority (Unfamiliar first)",
@@ -480,7 +463,7 @@ export default function App() {
       recurrence7days: "Mastered words reappear after 7 days",
       recurrenceAlways: "Familiar words always continue to repeat",
       levelFamiliar: "Familiar",
-      levelBlur: "Blur (Neutral)",
+      levelBlur: "Blur",
       levelUnfamiliar: "Unfamiliar",
       levelAll: "All Levels",
       searchWord: "Search words...",
@@ -753,7 +736,7 @@ export default function App() {
     } else {
       if (isReappearance) {
         triggerFeedback(
-          settings.language === "zh" ? "不错！复现巩固已成功，此卡标记为：模糊 💫" : "Good recovery! Card is marked as Neutral/Blur 💫",
+          settings.language === "zh" ? "不错！复现巩固已成功，此卡标记为：模糊 💫" : "Good recovery! Card is marked as Blur 💫",
           "success"
         );
       } else {
@@ -1011,144 +994,6 @@ export default function App() {
     setPersonalTab("input"); // Switch to input view
   };
 
-  // --- GEMINI AI SMART TEXT RECOGNITION AND PARSING ---
-  const handleGeminiParse = async () => {
-    if (!aiPasteText.trim()) {
-      triggerFeedback(settings.language === "zh" ? "请先粘贴带有单词释义的文本！" : "Please paste some text first!", "error");
-      return;
-    }
-
-    setIsAiParsing(true);
-    triggerFeedback(settings.language === "zh" ? "Gemini 正在帮您分析文本，请稍候..." : "Gemini is analyzing text, please wait...", "info");
-
-    try {
-      const response = await fetch("/api/gemini/parse-words", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: aiPasteText }),
-      });
-
-      const data = await response.json();
-      if (data.success && data.cards && data.cards.length > 0) {
-        const nowTimestamp = Date.now();
-        const newCards: Word[] = data.cards.map((card: any, idx: number) => ({
-          id: "word-gemini-" + Math.random().toString(36).substring(2, 9) + "-" + idx,
-          word: card.word.trim().toLowerCase(),
-          translationZh: card.translationZh.trim(),
-          translationEn: card.translationEn.trim(),
-          level: "unfamiliar" as WordLevel,
-          inputTime: nowTimestamp,
-          lastReviewedTime: null,
-          reviewCount: 0,
-          isNew: true,
-        }));
-
-        const mergedWords = [...newCards, ...words];
-        saveWordsToStorage(mergedWords);
-        
-        // Notify of fallback if Gemini was mock-parsed
-        if (data.fallback) {
-          triggerFeedback(data.warning, "info");
-        } else {
-          triggerFeedback(
-            t.aiSuccess.replace("{count}", data.cards.length.toString()),
-            "success"
-          );
-        }
-
-        setAiPasteText(""); // Clear parser text
-        generateTodayQueue(mergedWords); // Automatically update today's review candidates
-      } else {
-        triggerFeedback(settings.language === "zh" ? "未能提取到有效的西班牙语单词，请检查文本格式" : "No valid words extracted, please verify text format", "error");
-      }
-    } catch (err) {
-      console.error(err);
-      triggerFeedback(settings.language === "zh" ? "调用智能接口失败，请检查网络或重试" : "AI parsing failed, please try again", "error");
-    } finally {
-      setIsAiParsing(false);
-    }
-  };
-
-  // --- FILE IMPORT (JSON / CSV / TXT) ---
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const text = event.target?.result as string;
-        let importedCards: Array<{ word: string; translationZh: string; translationEn: string }> = [];
-
-        if (file.name.endsWith(".json")) {
-          const parsed = JSON.parse(text);
-          if (Array.isArray(parsed)) {
-            importedCards = parsed;
-          } else if (parsed.words && Array.isArray(parsed.words)) {
-            importedCards = parsed.words;
-          }
-        } else if (file.name.endsWith(".csv")) {
-          const rows = text.split("\n");
-          for (const row of rows) {
-            const cols = row.split(/,|，/);
-            if (cols.length >= 2) {
-              importedCards.push({
-                word: cols[0]?.trim() || "",
-                translationZh: cols[1]?.trim() || "",
-                translationEn: cols[2]?.trim() || cols[1]?.trim() || "",
-              });
-            }
-          }
-        } else {
-          // Normal TXT tab-separated or line-separated fallback
-          const lines = text.split("\n");
-          for (const line of lines) {
-            const parts = line.split(/\t|\s{2,}/);
-            if (parts.length >= 2) {
-              importedCards.push({
-                word: parts[0]?.trim() || "",
-                translationZh: parts[1]?.trim() || "",
-                translationEn: parts[2]?.trim() || parts[1]?.trim() || "",
-              });
-            }
-          }
-        }
-
-        if (importedCards.length === 0) {
-          triggerFeedback(settings.language === "zh" ? "未发现匹配的导入单词数据" : "No matching word data found", "error");
-          return;
-        }
-
-        const nowTimestamp = Date.now();
-        const validImported: Word[] = importedCards
-          .filter((c) => c.word && c.word.trim())
-          .map((c, idx) => ({
-            id: "word-import-" + Math.random().toString(36).substring(2, 9) + "-" + idx,
-            word: c.word.trim().toLowerCase(),
-            translationZh: c.translationZh || "（暂无）",
-            translationEn: c.translationEn || "（None）",
-            level: "unfamiliar",
-            inputTime: nowTimestamp,
-            lastReviewedTime: null,
-            reviewCount: 0,
-            isNew: true,
-          }));
-
-        const merged = [...validImported, ...words];
-        saveWordsToStorage(merged);
-        triggerFeedback(
-          settings.language === "zh" ? `成功导入了 ${validImported.length} 个单词卡！` : `Successfully imported ${validImported.length} cards!`,
-          "success"
-        );
-        generateTodayQueue(merged);
-      } catch (err) {
-        console.error(err);
-        triggerFeedback(settings.language === "zh" ? "解析文件失败，请确保文件格式正确" : "Parsing file failed, please check structure", "error");
-      }
-    };
-    reader.readAsText(file);
-  };
-
   // --- DICTIONARY LIST SEARCH & FILTER & SORT ---
   const filteredWords = useMemo(() => {
     let result = words.filter((w) => {
@@ -1286,8 +1131,15 @@ export default function App() {
                   🎉
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-natural-text mb-2">
-                    {t.learnSuccess}
+                  <h3 className="text-2xl font-bold text-natural-text mb-2 text-center">
+                    {settings.language === "zh" ? (
+                      t.learnSuccess
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <span>All words for today are learned!</span>
+                        <span className="block mt-1">Great job! 🎉</span>
+                      </div>
+                    )}
                   </h3>
                   <p className="text-sm text-natural-muted">
                     {settings.language === "zh"
